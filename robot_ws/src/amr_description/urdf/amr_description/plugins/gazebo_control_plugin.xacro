@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!--
+        必传参数：
+          left_joint_name   左轮continuous关节名称
+          right_joint_name  右轮continuous关节名称
+          wheel_separation  左右轮中心之间距离【轮距】
+          wheel_diameter    车轮直径
+        可选参数（带默认值，不传自动使用默认）：
+          odom_frame        里程计坐标系
+          update_rate       插件更新频率
+          max_torque        车轮最大扭矩
+          max_accel         车轮最大角加速度
+          base_frame        机器人底盘基准frame（一般base_footprint）
+          namespace         ROS命名空间
+    -->
+    <xacro:macro name="gazebo_control_plugin"
+                 params="left_joint_name right_joint_name wheel_separation wheel_diameter 
+                 odom_frame:=odom update_rate:=30 max_torque:=20 max_accel:=1.0 base_frame:=base_footprint namespace:=/">
+        <gazebo>
+            <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+                <ros>
+                    <namespace>${namespace}</namespace>
+                    <remapping>cmd_vel:=cmd_vel</remapping>
+                    <remapping>odom:=odom</remapping>
+                </ros>
+                <update_rate>${update_rate}</update_rate>
+                <!-- wheels -->
+                <left_joint>${left_joint_name}</left_joint>
+                <right_joint>${right_joint_name}</right_joint>
+                <!-- kinematics -->
+                <wheel_separation>${wheel_separation}</wheel_separation>
+                <wheel_diameter>${wheel_diameter}</wheel_diameter>
+                <!-- limits -->
+                <max_wheel_torque>${max_torque}</max_wheel_torque>
+                <max_wheel_acceleration>${max_accel}</max_wheel_acceleration>
+                <!-- output -->
+                <publish_odom>true</publish_odom>
+                <publish_odom_tf>true</publish_odom_tf>
+                <publish_wheel_tf>true</publish_wheel_tf>
+
+                <odometry_frame>${odom_frame}</odometry_frame>
+                <robot_base_frame>${base_frame}</robot_base_frame>
+            </plugin>
+        </gazebo>
+    </xacro:macro>
+</robot>
