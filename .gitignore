@@ -1,0 +1,39 @@
+# ================= ROS2 编译产物（机器人边缘代码）=================
+robot_ws/build/
+robot_ws/install/
+robot_ws/log/
+**/.ros
+**/.daemon
+*.db3
+*.db3-shm
+*.db3-wal
+
+# ================= 云端后端 Python =================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+*.env
+
+# ================= Web前端 =================
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+
+# ================= IDE 缓存 =================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ================= 系统文件 / 密钥 =================
+.DS_Store
+Thumbs.db
+*.pem
+*.key
