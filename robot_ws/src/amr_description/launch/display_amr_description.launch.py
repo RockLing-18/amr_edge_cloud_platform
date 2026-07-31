@@ -15,7 +15,7 @@ from launch.substitutions import LaunchConfiguration
 # 事件相关----------------------
 # from launch.event_handlers import OnProcessStart, OnProcessExit
 # from launch.actions import ExecuteProcess, RegisterEventHandler,LogInfo
-# 获取功能包下share目录路径-------
+# 获取功能包下share目录路径--------
 from ament_index_python.packages import get_package_share_directory
 
 from launch_ros.parameter_descriptions import ParameterValue
