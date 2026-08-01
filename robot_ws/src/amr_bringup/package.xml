@@ -4,7 +4,7 @@
   <name>amr_bringup</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="rockling-18@users.noreply.github.com">zyr</maintainer>
+  <maintainer email="noreply@example.com">RockLing</maintainer>
   <license>Apache-2.0</license>
 
   <test_depend>ament_copyright</test_depend>
