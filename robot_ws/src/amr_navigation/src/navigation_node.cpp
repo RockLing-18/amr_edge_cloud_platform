@@ -6,7 +6,12 @@
 class NavigationNode : public rclcpp::Node
 {
 public:
-    NavigationNode() : Node("navigation_node")
+    NavigationNode() : Node("navigation_node",
+        rclcpp::NodeOptions()
+            .append_parameter_override(
+                "use_sim_time",
+                true)
+    )
     {
     }
 
@@ -42,8 +47,9 @@ private:
     {
         geometry_msgs::msg::PoseStamped goal;
         goal.header.frame_id="map";
-        goal.pose.position.x=5.0;
-        goal.pose.position.y=3.0;
+        goal.header.stamp = this->now();
+        goal.pose.position.x=6.0;
+        goal.pose.position.y=5.0;
         // yaw=0
         goal.pose.orientation.w=1.0;
         m_navigation_manager->navigateTo(goal);

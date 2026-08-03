@@ -18,6 +18,13 @@ bool NavigationManager::navigateTo(const geometry_msgs::msg::PoseStamped &goal_p
         return false;
     }
 
+    RCLCPP_INFO(
+    m_node->get_logger(),
+    "Send goal frame=%s x=%.2f y=%.2f",
+    goal_pose.header.frame_id.c_str(),
+    goal_pose.pose.position.x,
+    goal_pose.pose.position.y);
+
     NavigateToPose::Goal goal;
     goal.pose = goal_pose;
     auto options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
@@ -54,11 +61,25 @@ void NavigationManager::goalResponseCallback(GoalHandle::SharedPtr goal_handle)
 
 void NavigationManager::feedbackCallback(GoalHandle::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback)
 {
-    RCLCPP_INFO(m_node->get_logger(), "剩余距离 %.2f m", feedback->distance_remaining);
+    auto pose = feedback->current_pose;
+
+    RCLCPP_INFO(
+        m_node->get_logger(),
+        "current(%.2f %.2f), remain %.2f",
+        pose.pose.position.x,
+        pose.pose.position.y,
+        feedback->distance_remaining
+    );
 }
 
 void NavigationManager::resultCallback(const GoalHandle::WrappedResult &result)
 {
+    RCLCPP_INFO(
+        m_node->get_logger(),
+        "导航结束 result code=%d",
+        static_cast<int>(result.code)
+    );
+
     m_navigating=false;
     switch(result.code)
     {
