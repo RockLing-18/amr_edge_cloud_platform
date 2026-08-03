@@ -48,8 +48,8 @@ private:
         geometry_msgs::msg::PoseStamped goal;
         goal.header.frame_id="map";
         goal.header.stamp = this->now();
-        goal.pose.position.x=6.0;
-        goal.pose.position.y=5.0;
+        goal.pose.position.x=2.0;
+        goal.pose.position.y=2.0;
         // yaw=0
         goal.pose.orientation.w=1.0;
         m_navigation_manager->navigateTo(goal);
