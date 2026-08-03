@@ -1,0 +1,92 @@
+#include "amr_navigation/navigation_manager.h"
+
+namespace amr_navigation
+{
+NavigationManager::NavigationManager(rclcpp::Node::SharedPtr node) : m_node(node)
+{
+    m_action_client = rclcpp_action::create_client<NavigateToPose>(
+            m_node,
+            "navigate_to_pose"
+        );
+}
+
+bool NavigationManager::navigateTo(const geometry_msgs::msg::PoseStamped &goal_pose)
+{
+    if(!m_action_client->wait_for_action_server(std::chrono::seconds(5)))
+    {
+        RCLCPP_ERROR(m_node->get_logger(), "Nav2 Action服务未启动");
+        return false;
+    }
+
+    NavigateToPose::Goal goal;
+    goal.pose = goal_pose;
+    auto options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
+    options.goal_response_callback = std::bind(&NavigationManager::goalResponseCallback, this, std::placeholders::_1);
+    options.feedback_callback = std::bind(
+            &NavigationManager::feedbackCallback,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2
+        );
+
+    options.result_callback = std::bind(
+            &NavigationManager::resultCallback,
+            this,
+            std::placeholders::_1
+        );
+
+    m_action_client->async_send_goal(goal, options);
+    return true;
+}
+
+void NavigationManager::goalResponseCallback(GoalHandle::SharedPtr goal_handle)
+{
+    if(!goal_handle)
+    {
+        RCLCPP_ERROR(m_node->get_logger(), "导航目标被拒绝");
+        return;
+    }
+
+    m_goal_handle = goal_handle;
+    m_navigating=true;
+    RCLCPP_INFO(m_node->get_logger(), "导航目标已接受");
+}
+
+void NavigationManager::feedbackCallback(GoalHandle::SharedPtr, const std::shared_ptr<const NavigateToPose::Feedback> feedback)
+{
+    RCLCPP_INFO(m_node->get_logger(), "剩余距离 %.2f m", feedback->distance_remaining);
+}
+
+void NavigationManager::resultCallback(const GoalHandle::WrappedResult &result)
+{
+    m_navigating=false;
+    switch(result.code)
+    {
+        case rclcpp_action::ResultCode::SUCCEEDED:
+            RCLCPP_INFO(m_node->get_logger(), "导航成功");
+            break;
+        case rclcpp_action::ResultCode::ABORTED:
+            RCLCPP_ERROR(m_node->get_logger(), "导航失败");
+            break;
+        case rclcpp_action::ResultCode::CANCELED:
+            RCLCPP_WARN(m_node->get_logger(), "导航取消");
+            break;
+        default:
+            break;
+    }
+}
+
+void NavigationManager::cancelNavigation()
+{
+    if(m_goal_handle && m_navigating)
+    {
+        m_action_client->async_cancel_goal(m_goal_handle);
+    }
+}
+
+bool NavigationManager::isNavigating() const
+{
+    return m_navigating;
+}
+
+}
