@@ -1,6 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "amr_navigation/tf_helper.h"
 #include "amr_navigation/navigation_manager.h"
+#include "amr_navigation/waypoint_navigator.h"
 
 
 class NavigationNode : public rclcpp::Node
@@ -18,10 +19,14 @@ public:
     void init()
     {
         m_tf_helper = std::make_shared<amr_navigation::TFHelper>(shared_from_this());
-        m_navigation_manager =std::make_shared<amr_navigation::NavigationManager>(shared_from_this());
-
+        m_navigation_manager = std::make_shared<amr_navigation::NavigationManager>(shared_from_this());
+        m_navigator = std::make_shared<amr_navigation::WaypointNavigator>(shared_from_this());
         // 测试导航
-        sendNavigationGoal();
+        //sendNavigationGoal();
+
+        // 测试多点导航
+        sendWaypointGoal();
+
         m_timer = create_wall_timer(
                 std::chrono::seconds(1),
                 std::bind(&NavigationNode::updatePose, this)
@@ -55,9 +60,31 @@ private:
         m_navigation_manager->navigateTo(goal);
     }
 
+
+    void sendWaypointGoal()
+    {
+        std::vector<geometry_msgs::msg::PoseStamped> goals;
+
+        auto create_goal = [&](double x,double y)
+        {
+            geometry_msgs::msg::PoseStamped pose;
+            pose.header.frame_id="map";
+            pose.header.stamp = this->now();
+            pose.pose.position.x=x;
+            pose.pose.position.y=y;
+            pose.pose.orientation.w=1.0;
+            return pose;
+        };
+
+        goals.push_back(create_goal(0,0));
+        goals.push_back(create_goal(2,0));
+        goals.push_back(create_goal(2,2));
+        m_navigator->followWaypoints(goals);
+    }
 private:
     std::shared_ptr<amr_navigation::TFHelper> m_tf_helper;
     std::shared_ptr<amr_navigation::NavigationManager> m_navigation_manager;
+    std::shared_ptr<amr_navigation::WaypointNavigator> m_navigator;
     rclcpp::TimerBase::SharedPtr m_timer;
 };
 

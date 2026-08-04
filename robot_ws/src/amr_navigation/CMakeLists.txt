@@ -67,6 +67,28 @@ ament_target_dependencies(
 )
 
 # ============================
+# waypoint navigator Library
+# ============================
+add_library(
+    waypoint_navigator
+    src/waypoint_navigator.cpp
+)
+
+target_include_directories(
+    waypoint_navigator
+    PUBLIC
+    include
+)
+
+ament_target_dependencies(
+    waypoint_navigator
+    rclcpp
+    rclcpp_action
+    nav2_msgs
+    geometry_msgs
+)
+
+# ============================
 # Navigation Node
 # ============================
 add_executable(
@@ -78,6 +100,7 @@ target_link_libraries(
     navigation_node
     tf_helper
     navigation_manager
+    waypoint_navigator
 )
 
 ament_target_dependencies(
@@ -94,6 +117,7 @@ install(
     navigation_node
     tf_helper
     navigation_manager
+    waypoint_navigator
     DESTINATION
     lib/${PROJECT_NAME}
 )
