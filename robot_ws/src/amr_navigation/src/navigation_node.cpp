@@ -24,13 +24,15 @@ public:
         // 测试导航
         //sendNavigationGoal();
 
-        // 测试多点导航
-        sendWaypointGoal();
+        
 
         m_timer = create_wall_timer(
-                std::chrono::seconds(1),
+                std::chrono::seconds(3),
                 std::bind(&NavigationNode::updatePose, this)
             );
+
+        // 测试多点导航
+        sendWaypointGoal();
     }
 
 private:
@@ -76,9 +78,10 @@ private:
             return pose;
         };
 
-        goals.push_back(create_goal(0,0));
+        goals.push_back(create_goal(1,1));
         goals.push_back(create_goal(2,0));
         goals.push_back(create_goal(2,2));
+        goals.push_back(create_goal(0,0));
         m_navigator->followWaypoints(goals);
     }
 private:
