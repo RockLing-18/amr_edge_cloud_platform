@@ -21,10 +21,14 @@ public:
         m_tf_helper = std::make_shared<amr_navigation::TFHelper>(shared_from_this());
         m_navigation_manager = std::make_shared<amr_navigation::NavigationManager>(shared_from_this());
         m_navigator = std::make_shared<amr_navigation::WaypointNavigator>(shared_from_this());
+        m_navigator->setFeedbackCallback([](int index)
+        {
+            RCLCPP_INFO(rclcpp::get_logger("test"), "Waypoint %d reached", index);
+        });
+
+
         // 测试导航
         //sendNavigationGoal();
-
-        
 
         m_timer = create_wall_timer(
                 std::chrono::seconds(3),

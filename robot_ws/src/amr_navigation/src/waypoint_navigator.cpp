@@ -26,16 +26,26 @@ bool WaypointNavigator::followWaypoints(const std::vector<geometry_msgs::msg::Po
     
     auto goal_msg = FollowWaypoints::Goal();
     goal_msg.poses = poses;
-    auto future_goal = m_client->async_send_goal(goal_msg);
+    auto send_goal_options = rclcpp_action::Client<FollowWaypoints>::SendGoalOptions();
+    send_goal_options.feedback_callback = [this](GoalHandle::SharedPtr, const std::shared_ptr<const FollowWaypoints::Feedback> feedback)
+    {
+        int index = feedback->current_waypoint;
+        RCLCPP_INFO(m_node->get_logger(), "Current waypoint: %d", index);
+        if(m_feedback_callback)
+        {
+            m_feedback_callback(index);
+        }
+    };
 
+    auto future_goal = m_client->async_send_goal(goal_msg, send_goal_options);
     if(rclcpp::spin_until_future_complete(m_node, future_goal) != rclcpp::FutureReturnCode::SUCCESS)
     {
         RCLCPP_ERROR( m_node->get_logger(), "send waypoint goal failed");
         return false;
     }
 
-    auto goal_handle = future_goal.get();
-    if(!goal_handle)
+    auto m_goal_handle  = future_goal.get();
+    if(!m_goal_handle)
     {
         RCLCPP_ERROR(m_node->get_logger(), "waypoint rejected");
         return false;
@@ -43,7 +53,7 @@ bool WaypointNavigator::followWaypoints(const std::vector<geometry_msgs::msg::Po
 
     RCLCPP_INFO(m_node->get_logger(), "waypoint accepted");
 
-    auto result_future = m_client->async_get_result(goal_handle);
+    auto result_future = m_client->async_get_result(m_goal_handle);
 
     while(rclcpp::ok() && result_future.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready)
     {
@@ -63,6 +73,32 @@ bool WaypointNavigator::followWaypoints(const std::vector<geometry_msgs::msg::Po
             RCLCPP_ERROR(m_node->get_logger(), "waypoint failed");
             return false;
     }
+}
+
+void WaypointNavigator::setFeedbackCallback(FeedbackCallback callback)
+{
+    m_feedback_callback = callback;
+}
+
+bool WaypointNavigator::cancel()
+{
+    if(!m_goal_handle)
+    {
+        RCLCPP_WARN(m_node->get_logger(), "No active navigation goal");
+        return false;
+    }
+
+    auto future_cancel = m_client->async_cancel_goal(m_goal_handle);
+    if(rclcpp::spin_until_future_complete(m_node,future_cancel) != rclcpp::FutureReturnCode::SUCCESS)
+    {
+        RCLCPP_ERROR(m_node->get_logger(), "Cancel failed");
+        return false;
+    }
+
+    RCLCPP_INFO(m_node->get_logger(), "Navigation canceled");
+    m_active=false;
+    m_goal_handle.reset();
+    return true;
 }
 
 }
