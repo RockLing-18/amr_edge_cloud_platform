@@ -59,10 +59,10 @@ private:
         geometry_msgs::msg::PoseStamped goal;
         goal.header.frame_id="map";
         goal.header.stamp = this->now();
-        goal.pose.position.x=2.0;
-        goal.pose.position.y=2.0;
+        goal.pose.position.x = 2.0;
+        goal.pose.position.y = 2.0;
         // yaw=0
-        goal.pose.orientation.w=1.0;
+        goal.pose.orientation.w = 1.0;
         m_navigation_manager->navigateTo(goal);
     }
 
@@ -76,9 +76,9 @@ private:
             geometry_msgs::msg::PoseStamped pose;
             pose.header.frame_id="map";
             pose.header.stamp = this->now();
-            pose.pose.position.x=x;
-            pose.pose.position.y=y;
-            pose.pose.orientation.w=1.0;
+            pose.pose.position.x = x;
+            pose.pose.position.y = y;
+            pose.pose.orientation.w = 1.0;
             return pose;
         };
 
@@ -104,4 +104,5 @@ int main(int argc, char **argv)
     node->init();
     rclcpp::spin(node);
     rclcpp::shutdown();
+    return 0;
 }
