@@ -10,8 +10,8 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory(
         'amr_description')
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
-    rviz_config_dir = os.path.join(
-        nav2_bringup_dir, 'rviz', 'nav2_default_view.rviz')
+    nav2_view_dir = get_package_share_directory('amr_description')
+    rviz_config_dir = os.path.join(nav2_view_dir, 'rviz', 'nav2_view.rviz')
     
     # 创建 Launch 配置
     use_sim_time = launch.substitutions.LaunchConfiguration(

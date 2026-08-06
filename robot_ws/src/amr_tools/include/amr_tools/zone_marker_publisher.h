@@ -28,6 +28,7 @@ public:
 private:
     visualization_msgs::msg::Marker createLineMarker(const Zone& zone, bool preview = false);
     visualization_msgs::msg::Marker createTextMarker(const Zone& zone, bool preview = false);
+    std::pair<double,double> calculateCentroid(const std::vector<std::pair<double,double>>& polygon);
 
 private:
     rclcpp::Node::SharedPtr m_node;
