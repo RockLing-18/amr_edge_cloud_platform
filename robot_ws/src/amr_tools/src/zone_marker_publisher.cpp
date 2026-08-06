@@ -191,28 +191,52 @@ void ZoneMarkerPublisher::clear()
 
 std::pair<double,double> ZoneMarkerPublisher::calculateCentroid(const std::vector<std::pair<double,double>>& polygon)
 {
-    double area = 0.0;
-    double cx = 0.0;
-    double cy = 0.0;
-    int n = polygon.size();
-    for(int i=0;i<n;i++)
-    {
-        auto p1 = polygon[i];
-        auto p2 = polygon[(i+1) % n];
+    double min_x = std::numeric_limits<double>::max();
+    double max_x = -min_x;
 
-        double cross = p1.first * p2.second - p2.first * p1.second;
-        area += cross;
-        cx += (p1.first+p2.first)*cross;
-        cy += (p1.second+p2.second)*cross;
+    double min_y = std::numeric_limits<double>::max();
+    double max_y = -min_y;
+
+
+    for(const auto& p : polygon)
+    {
+        min_x = std::min(min_x, p.first);
+        max_x = std::max(max_x, p.first);
+
+        min_y = std::min(min_y, p.second);
+        max_y = std::max(max_y, p.second);
     }
 
-    area *= 0.5;
-    if(std::fabs(area) < 1e-6)
-    {
-        return polygon.front();
-    }
 
-    cx /= (6.0*area);
-    cy /= (6.0*area);
-    return {cx,cy};
+    double x = (min_x + max_x)/2;
+    double y = (min_y + max_y)/2;
+    return {x, y};
+
+
+    // double area = 0.0;
+    // double cx = 0.0;
+    // double cy = 0.0;
+    // int n = polygon.size();
+
+    // std::cout << "polygon.size:" << n << std::endl;
+    // for(int i=0; i<n; i++)
+    // {
+    //     auto p1 = polygon[i];
+    //     auto p2 = polygon[(i+1) % n];
+
+    //     double cross = p1.first * p2.second - p2.first * p1.second;
+    //     area += cross;
+    //     cx += (p1.first+p2.first)*cross;
+    //     cy += (p1.second+p2.second)*cross;
+    // }
+
+    // area *= 0.5;
+    // if(std::fabs(area) < 1e-6)
+    // {
+    //     return polygon.front();
+    // }
+
+    // cx /= (6.0*area);
+    // cy /= (6.0*area);
+    // return {cx,cy};
 }
