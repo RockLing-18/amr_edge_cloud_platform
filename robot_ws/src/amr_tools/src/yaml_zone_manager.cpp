@@ -25,10 +25,12 @@ bool YamlZoneManager::load(const std::string& filename)
         }
 
         m_vZone.clear();
+        int marker_id = 1;
         for(auto zoneNode : zones)
         {
             Zone zone;
             zone.info.id = zoneNode["id"].as<std::string>();
+            zone.marker_id = marker_id++;
             zone.info.name = zoneNode["name"].as<std::string>();
             zone.info.type = zoneNode["type"].as<std::string>();
             auto polygon = zoneNode["polygon"];
@@ -42,7 +44,7 @@ bool YamlZoneManager::load(const std::string& filename)
             m_vZone.push_back(zone);
         }
     }
-    catch( const std::exception& e)
+    catch(const std::exception& e)
     {
         std::cerr << "load zones failed:" << e.what() << std::endl;
         return false;
@@ -51,7 +53,7 @@ bool YamlZoneManager::load(const std::string& filename)
     return true;
 }
 
-bool YamlZoneManager::addZone(const Zone& zone)
+bool YamlZoneManager::addZone(Zone& zone)
 {
     for(auto& item : m_vZone)
     {
@@ -61,6 +63,8 @@ bool YamlZoneManager::addZone(const Zone& zone)
             return false;
         }
     }
+
+    zone.marker_id = m_vZone.size() + 1;
 
     m_vZone.push_back(zone);
     return true;
@@ -147,4 +151,9 @@ bool YamlZoneManager::save()
     file << out.c_str();
     file.close();
     return true;
+}
+
+const std::vector<Zone>& YamlZoneManager::getZones() const
+{
+    return m_vZone;
 }

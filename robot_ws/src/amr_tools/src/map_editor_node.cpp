@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 #include "yaml_zone_manager.h"
+#include "zone_marker_publisher.h"
 
 class MapEditorNode : public rclcpp::Node
 {
@@ -16,6 +17,9 @@ public:
 
     ~MapEditorNode()
     {
+        if(m_marker_pub)
+            m_marker_pub->clear();
+        
         m_running=false;
         if(m_terminal_thread.joinable())
         {
@@ -43,6 +47,9 @@ public:
             std::bind(&MapEditorNode::onPointClicked, this, std::placeholders::_1)
         );
 
+        m_marker_pub =std::make_shared<ZoneMarkerPublisher>(shared_from_this());
+        m_marker_pub->publishZones(m_zone_manager.getZones());
+
         m_terminal_thread = std::thread(&MapEditorNode::terminalLoop, this);
     }
 
@@ -65,6 +72,15 @@ private:
     {
         if(!m_collecting)
             return;
+        
+        if(m_vPoint.size() < 3)
+        {
+            std::cout<<"polygon need >=3 points\n";
+            m_receiver->stop();
+            m_marker_pub->clearPreview();
+            m_collecting=false;
+            return;
+        }
 
         m_receiver->stop();
         m_collecting = false;
@@ -80,7 +96,11 @@ private:
         if(m_zone_manager.addZone(zone))
         {
             if(m_zone_manager.save())
+            {
                 std::cout << "save zone success\n";
+                m_marker_pub->clearPreview();
+                m_marker_pub->publishZone(zone);
+            }
             else
                 std::cout << "save zone failed\n";
         }
@@ -130,6 +150,12 @@ private:
 
         RCLCPP_INFO(get_logger(),"click x=%f y=%f", point.point.x, point.point.y);
         m_vPoint.emplace_back(point.point.x, point.point.y);
+
+        Zone preview;
+        preview.info.id = "preview";
+        preview.info.name = "drawing";
+        preview.polygon = m_vPoint;
+        m_marker_pub->publishPreview(preview);
     }
 
     Zone inputZoneInfo()
@@ -147,6 +173,7 @@ private:
     
 private:
     std::shared_ptr<ClickedPointReceiver> m_receiver;
+    std::shared_ptr<ZoneMarkerPublisher> m_marker_pub;
     std::vector<std::pair<double,double>> m_vPoint;
     std::thread m_terminal_thread;
     std::atomic<bool> m_running{true};

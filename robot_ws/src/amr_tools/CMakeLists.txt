@@ -32,6 +32,7 @@ add_library(
   amr_tools_common
   src/clicked_point_receiver.cpp
   src/yaml_zone_manager.cpp
+  src/zone_marker_publisher.cpp
 )
 
 target_include_directories(

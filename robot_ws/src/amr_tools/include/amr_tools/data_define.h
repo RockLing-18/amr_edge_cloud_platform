@@ -13,5 +13,7 @@ struct ZoneInfo
 struct Zone
 {
     ZoneInfo info;
+    std::string frame_id{"map"};
+    int marker_id{-1};  // marker运行时id
     std::vector<std::pair<double,double>> polygon;
 };
