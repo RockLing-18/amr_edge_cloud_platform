@@ -8,8 +8,9 @@ Panels:
         - /TF1/Frames1
         - /TF1/Tree1
         - /MarkerArray2
-        - /MarkerArray2/Topic1
-      Splitter Ratio: 0.5833333134651184
+        - /MarkerArray3
+        - /MarkerArray3/Topic1
+      Splitter Ratio: 0.5611110925674438
     Tree Height: 462
   - Class: rviz_common/Selection
     Name: Selection
@@ -492,13 +493,26 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        {}
+        zone_line: true
+        zone_text: true
       Topic:
         Depth: 10
         Durability Policy: Transient Local
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /zone_marker
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        station_point: true
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /station_point_marker
       Value: true
   Enabled: true
   Global Options:
@@ -571,5 +585,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1545
-  X: 813
-  Y: 27
+  X: 1083
+  Y: 52

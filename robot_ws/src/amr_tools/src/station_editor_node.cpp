@@ -155,10 +155,11 @@ private:
 
         RCLCPP_INFO(get_logger(), "click x=%f y=%f", point.point.x, point.point.y);
 
-        m_preview_location = inputLocationInfo();
+        // m_preview_location = inputLocationInfo();
         m_preview_location.pose.x = point.point.x;
         m_preview_location.pose.y =  point.point.y;
         m_preview_location.pose.yaw = 0; //此处该赋什么值
+        m_preview_location.type = "work";
         m_preview_location.id = m_preview_station.id + "_location_" + std::to_string(m_preview_station.locations.size() + 1);
         m_preview_station.locations.push_back(m_preview_location);
         m_station_point_marker_pub->publishPreview(m_preview_station);
