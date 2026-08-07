@@ -7,15 +7,15 @@
 #include "yaml_zone_manager.h"
 #include "zone_marker_publisher.h"
 
-class MapEditorNode : public rclcpp::Node
+class ZoneEditorNode : public rclcpp::Node
 {
 public:
-    MapEditorNode() : Node("map_editor")
+    ZoneEditorNode() : Node("zone_editor")
     {
         this->declare_parameter<std::string>("map_dir","");
     }
 
-    ~MapEditorNode()
+    ~ZoneEditorNode()
     {
         if(m_marker_pub)
             m_marker_pub->clear();
@@ -44,13 +44,13 @@ public:
 
         m_receiver = std::make_shared<ClickedPointReceiver>(
             shared_from_this(),
-            std::bind(&MapEditorNode::onPointClicked, this, std::placeholders::_1)
+            std::bind(&ZoneEditorNode::onPointClicked, this, std::placeholders::_1)
         );
 
         m_marker_pub =std::make_shared<ZoneMarkerPublisher>(shared_from_this());
         m_marker_pub->publishZones(m_zone_manager.getZones());
 
-        m_terminal_thread = std::thread(&MapEditorNode::terminalLoop, this);
+        m_terminal_thread = std::thread(&ZoneEditorNode::terminalLoop, this);
     }
 
 private:
@@ -78,7 +78,7 @@ private:
             std::cout<<"polygon need >=3 points\n";
             m_receiver->stop();
             m_marker_pub->clearPreview();
-            m_collecting=false;
+            m_collecting = false;
             return;
         }
 
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
     {
-        auto node = std::make_shared<MapEditorNode>();
+        auto node = std::make_shared<ZoneEditorNode>();
         node->init();
         rclcpp::spin(node);
     }

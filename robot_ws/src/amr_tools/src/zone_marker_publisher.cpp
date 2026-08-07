@@ -66,7 +66,7 @@ visualization_msgs::msg::Marker ZoneMarkerPublisher::createLineMarker(const Zone
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = zone.frame_id;
     marker.header.stamp = m_node->get_clock()->now();
-    marker.ns = preview ? "preview_zone_line" : "zone_" + std::to_string(zone.marker_id) + "_line";
+    marker.ns = preview ? "preview_zone_line" : "zone_line";
     marker.id = preview ? 0 : zone.marker_id;
     marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
     marker.action = visualization_msgs::msg::Marker::ADD;
@@ -116,7 +116,7 @@ visualization_msgs::msg::Marker ZoneMarkerPublisher::createTextMarker(const Zone
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = zone.frame_id;
     marker.header.stamp = m_node->get_clock()->now();
-    marker.ns = preview ? "preview_zone_text" : "zone_" + std::to_string(zone.marker_id) + "_text";
+    marker.ns = preview ? "preview_zone_text" : "zone_text";
     marker.id = preview ? 0 : zone.marker_id;
     marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
     marker.action = visualization_msgs::msg::Marker::ADD;

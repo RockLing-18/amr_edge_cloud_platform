@@ -29,10 +29,12 @@ include_directories(
 )
 
 add_library(
-  amr_tools_common
-  src/clicked_point_receiver.cpp
-  src/yaml_zone_manager.cpp
-  src/zone_marker_publisher.cpp
+amr_tools_common
+src/clicked_point_receiver.cpp
+src/yaml_zone_manager.cpp
+src/yaml_station_manager.cpp
+src/zone_marker_publisher.cpp
+src/station_marker_publisher.cpp
 )
 
 target_include_directories(
@@ -54,26 +56,46 @@ target_link_libraries(
 )
 
 add_executable(
-  map_editor
-  src/map_editor_node.cpp
+  zone_editor
+  src/zone_editor_node.cpp
 )
 
+
 target_link_libraries(
-  map_editor
+  zone_editor
   amr_tools_common
 )
 
 ament_target_dependencies(
-  map_editor
+  zone_editor
   rclcpp
   geometry_msgs
   visualization_msgs
 )
 
+add_executable(
+  station_editor
+  src/station_editor_node.cpp
+)
+
+
+target_link_libraries(
+station_editor
+amr_tools_common
+)
+
+ament_target_dependencies(
+station_editor
+rclcpp
+geometry_msgs
+visualization_msgs
+)
+
 install(
   TARGETS
   amr_tools_common
-  map_editor
+  zone_editor
+  station_editor
   DESTINATION lib/${PROJECT_NAME}
 )
 
